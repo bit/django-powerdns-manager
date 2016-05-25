@@ -179,7 +179,7 @@ def dynamic_ip_update_view(request):
         -F "hostname=ns1.centos.example.org" \
         -F "ipv4=10.1.2.3" \
         -F "ipv6=3ffe:1900:4545:3:200:f8ff:fe21:67cf" \
-        https://centos.example.org/powerdns/update/
+        https://centos.example.org/powerdns/zone/update/
 
     """
     if request.method != 'POST':
