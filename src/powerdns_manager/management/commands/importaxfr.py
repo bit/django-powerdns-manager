@@ -86,7 +86,7 @@ class Command(BaseCommand):
         for domain in domains:
             try:
                 process_axfr_response(domain, nameserver, owner, overwrite=overwrite)
-            except Exception, e:
+            except Exception as e:
                 sys.stderr.write('error: %s: %s\n' % (str(e), domain))
                 sys.stderr.flush()
             else:

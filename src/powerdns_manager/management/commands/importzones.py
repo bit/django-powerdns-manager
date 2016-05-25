@@ -69,7 +69,7 @@ class Command(BaseCommand):
                 f.close()
                 try:
                     process_zone_file(None, data, owner, overwrite=overwrite)
-                except Exception, e:
+                except Exception as e:
                     sys.stderr.write('error: %s: %s\n' % (str(e), zonefile))
                     sys.stderr.flush()
                 else:

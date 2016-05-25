@@ -32,7 +32,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseBadRequest
@@ -82,7 +82,7 @@ def import_zone_view(request):
             
             try:
                 process_zone_file(origin, zonetext, request.user, overwrite)
-            except Exception, e:
+            except Exception as e:
                 info_dict = {
                     'strerror': mark_safe(str(e)),
                 }
@@ -112,7 +112,7 @@ def import_axfr_view(request):
             
             try:
                 process_axfr_response(origin, nameserver, request.user, overwrite)
-            except Exception, e:
+            except Exception as e:
                 info_dict = {
                     'strerror': mark_safe(str(e)),
                 }
@@ -138,7 +138,7 @@ def export_zone_view(request, origin):
     Domain = get_model('powerdns_manager', 'Domain')
     
     obj = Domain.objects.get(name=origin)
-    obj_display = force_unicode(obj)
+    obj_display = force_text(obj)
             
     # Check zone ownership.
     if request.user != obj.created_by:
@@ -324,7 +324,7 @@ def zone_set_type_view(request, id_list):
         
         for n, zone_id in enumerate(id_list):
             obj = Domain.objects.get(id=zone_id)
-            obj_display = force_unicode(obj)
+            obj_display = force_text(obj)
             
             # Check zone ownership.
             if request.user != obj.created_by:
@@ -389,7 +389,7 @@ def zone_set_ttl_view(request, id_list):
             
             for n, zone_id in enumerate(id_list):
                 obj = Domain.objects.get(id=zone_id)
-                obj_display = force_unicode(obj)
+                obj_display = force_text(obj)
                 
                 # Check zone ownership.
                 if request.user != obj.created_by:
@@ -414,7 +414,7 @@ def zone_set_ttl_view(request, id_list):
                             rr.content = ' '.join(bits)
                         # Save the resource record
                         rr.save()
-                        rr_display = force_unicode(rr)
+                        rr_display = force_text(rr)
                     
                     # Update the domain serial
                     obj.update_serial()
@@ -497,7 +497,7 @@ def zone_clone_view(request, zone_id):
             
             # Check zone ownership.
             if request.user != domain_obj.created_by:
-                messages.error(request, "Insufficient permissions to clone domain '%s'" % force_unicode(domain_obj))
+                messages.error(request, "Insufficient permissions to clone domain '%s'" % force_text(domain_obj))
                 return HttpResponseRedirect(reverse('admin:powerdns_manager_domain_changelist'))
             
             # Create the clone (Check for uniqueness takes place in forms.ClonedZoneDomainForm 
@@ -640,13 +640,13 @@ def zone_transfer_view(request, id_list):
             # in the ZoneTransferForm.
             User = get_user_model()
             owner = User.objects.get(username=transfer_to_username)
-            owner_display = force_unicode(owner)
+            owner_display = force_text(owner)
             
             Domain = get_model('powerdns_manager', 'Domain')
             
             for n, zone_id in enumerate(id_list):
                 obj = Domain.objects.get(id=zone_id)
-                obj_display = force_unicode(obj)
+                obj_display = force_text(obj)
                 
                 # Check zone ownership.
                 if request.user != obj.created_by:
@@ -713,7 +713,7 @@ def template_create_zone_view(request, template_id):
         Domain = get_model('powerdns_manager', 'Domain')
         
         template_obj = ZoneTemplate.objects.get(id=template_id)
-        template_obj_display = force_unicode(template_obj)
+        template_obj_display = force_text(template_obj)
         
         # Check template ownership.
         if request.user != template_obj.created_by:

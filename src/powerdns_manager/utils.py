@@ -29,7 +29,6 @@ import time
 import hashlib
 import base64
 import string
-import StringIO
 import re
 
 import dns.zone
@@ -54,6 +53,7 @@ except ImportError:
 from django.utils.crypto import get_random_string
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
+from django.utils.six import StringIO, PY2
 
 from powerdns_manager import settings
 
@@ -187,7 +187,7 @@ def generate_api_key():
 def clean_zonefile(data):
     EOL = '\n'
     lines = []
-    f = StringIO.StringIO(data)
+    f = StringIO(data)
     for line in f:
         line = line.strip()
         if line:
@@ -227,7 +227,7 @@ def process_zone_file(origin, zonetext, owner, overwrite=False):
         raise Exception('The zone\'s origin is unknown')
     except BadZone:
         raise Exception('The zone is malformed')
-    except DNSException, e:
+    except DNSException as e:
         #raise Exception(str(e))
         raise Exception('The zone is malformed')
 
@@ -256,7 +256,7 @@ def process_axfr_response(origin, nameserver, owner, overwrite=False):
         raise Exception('The zone\'s origin is unknown')
     except BadZone:
         raise Exception('The zone is malformed')
-    except DNSException, e:
+    except DNSException as e:
         if not str(e):
             raise Exception('Transfer Failed')
         raise Exception(str(e))
@@ -349,7 +349,7 @@ def process_and_import_zone_data(zone, owner, overwrite=False):
                 elif rdataset.rdtype == dns.rdatatype._by_text['TXT']:
                     # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.TXT.TXT-class.html
                     rr.type = 'TXT'
-                    rr.content = '"%s"' % ''.join(rdata.strings)
+                    rr.content = '"%s"' % b''.join(rdata.strings).decode()
                 
                 elif rdataset.rdtype == dns.rdatatype._by_text['CNAME']:
                     # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.CNAME.CNAME-class.html
@@ -369,7 +369,7 @@ def process_and_import_zone_data(zone, owner, overwrite=False):
                 elif rdataset.rdtype == dns.rdatatype._by_text['SPF']:
                     # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.SPF.SPF-class.html
                     rr.type = 'SPF'
-                    rr.content = '"%s"' % ''.join(rdata.strings)
+                    rr.content = '"%s"' % b''.join(rdata.strings).decode()
                 
                 elif rdataset.rdtype == dns.rdatatype._by_text['PTR']:
                     # http://www.dnspython.org/docs/1.10.0/html/dns.rdtypes.ANY.PTR.PTR-class.html
@@ -891,8 +891,12 @@ def sha1hash(x, salt):
 # alphabet used by NSEC3 (see RFC 4648, Section 7). This alphabet
 # has the property that encoded data maintains its sort order when
 # compared bitwise.
-b32_to_ext_hex = string.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
-                                  '0123456789ABCDEFGHIJKLMNOPQRSTUV')
+if PY2:
+    maketrans = string.maketrans
+else:
+    maketrans = bytes.maketrans
+b32_to_ext_hex = maketrans(b'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
+                           b'0123456789ABCDEFGHIJKLMNOPQRSTUV')
 
 def pdnssec_hash_zone_record(zone_name, record_name):
     """Generates hash for ordername field in NSEC3 non-narrow mode.

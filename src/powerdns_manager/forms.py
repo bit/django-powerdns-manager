@@ -98,7 +98,7 @@ class BaseRecordModelForm(forms.ModelForm):
         # This ensures that we do not catch a SOA record, for which the name
         # is added in the SoaRecordModelForm.save(). A SOA record will never
         # have a bogus name, since it is not user-editable. 
-        if not self.cleaned_data.has_key('name'):
+        if 'name' not in self.cleaned_data:
             return self.cleaned_data
         
         name = self.cleaned_data.get('name')
@@ -158,7 +158,7 @@ class SoaRecordModelForm(BaseRecordModelForm):
         See: http://doc.powerdns.com/types.html#soa-type
         
         """
-        if kwargs.has_key('instance'):
+        if 'instance' in kwargs:
             instance = kwargs['instance']
             if instance.pk is not None:    # This check asserts that this is an EDIT
                 if instance.type == 'SOA':
@@ -299,7 +299,7 @@ class SrvRecordModelForm(BaseRecordModelForm):
     
     def __init__(self, *args, **kwargs):
         """Set initial values for extra ModelForm fields."""
-        if kwargs.has_key('instance'):
+        if 'instance' in kwargs:
             instance = kwargs['instance']
             if instance.pk is not None:    # This check asserts that this is an EDIT
                 if instance.type == 'SRV':
