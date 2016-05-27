@@ -76,7 +76,7 @@ class DynamicZoneInline(admin.StackedInline):
     model = get_model('powerdns_manager', 'DynamicZone')
     fields = ('is_dynamic', 'api_key')
     readonly_fields = ('api_key', )
-    search_fields = ('domain', )
+    search_fields = ('domain__name', )
     verbose_name = 'Dynamic Zone'
     verbose_name_plural = 'Dynamic Zone'    # Only one dynamic zone per domain
     can_delete = False
@@ -259,7 +259,7 @@ class DomainAdmin(admin.ModelAdmin):
     #list_display -- Set by get_list_display()
     #list_filter = ['type', 'created_by']
     #list_filter -- Set by get_list_filter()
-    search_fields = ['name', 'master', 'created_by']
+    search_fields = ['name', 'master', 'created_by__username']
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
     save_on_top = True
