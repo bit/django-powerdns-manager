@@ -352,7 +352,7 @@ class DomainMetadata(models.Model):
     content = models.TextField(blank=True, null=True, verbose_name=_('content'), help_text="""Enter the metadata.""")
     
     # PowerDNS Manager internal fields
-    date_modified = models.DateTimeField(auto_now=True, verbose_name=_('Last Modified'))
+    date_modified = models.DateTimeField(auto_now=True, null=True, verbose_name=_('Last Modified'))
 
     class Meta:
         db_table = 'domainmetadata'
